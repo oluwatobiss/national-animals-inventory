@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title><%= title %></title>
+</head>
+
+<body>
+  <h1><%= title %></h1>
+  <ul>
+    <% countries.forEach(function (row) { %>
+    <li><%= row.country %></li>
+    <li><%= row.national_animal %></li>
+    <li><%= row.type %></li>
+    <% }) %>
+  </ul>
+  <a href="/new-animal">Add your national animal</a>
+</body>
+
+</html>

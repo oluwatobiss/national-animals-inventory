@@ -1,5 +1,5 @@
 const { Pool } = require("pg");
-const pool = new Pool();
+const pool = new Pool({ connectionString: process.env.DB_URI });
 
 const createTables = `
 CREATE TABLE IF NOT EXISTS countries (
@@ -45,68 +45,65 @@ async function insertAnimal(country, animal, type) {
   let animalExists = false;
   let typeExists = false;
   // Prevent duplicate data entry
-  try {
-    countryExists = await pool.query(
-      "INSERT INTO countries (name) VALUES ($1)",
-      [country]
-    );
-  } catch (err) {
+  function showError(err) {
+    console.log("===Error inserting data===");
     console.error(err.detail);
+  }
+  try {
+    await pool.query("INSERT INTO countries (name) VALUES ($1)", [country]);
+  } catch (err) {
+    showError(err);
     countryExists = err.detail.includes("already exists");
   }
   try {
-    animalExists = await pool.query("INSERT INTO animals (name) VALUES ($1)", [
-      animal,
-    ]);
+    await pool.query("INSERT INTO animals (name) VALUES ($1)", [animal]);
   } catch (err) {
-    console.error(err.detail);
+    showError(err);
     animalExists = err.detail.includes("already exists");
   }
   try {
-    typeExists = await pool.query(
-      "INSERT INTO animal_types (type) VALUES ($1)",
-      [type]
-    );
+    await pool.query("INSERT INTO animal_types (type) VALUES ($1)", [type]);
   } catch (err) {
-    console.error(err.detail);
+    showError(err);
     typeExists = err.detail.includes("already exists");
   }
 
   // Prevent duplicate data relationship entry
   const countryId = await pool.query(
-    "SELECT id FROM countries WHERE countries.name=$1",
-    [country]
+    `SELECT id FROM countries WHERE countries.name='${country}'`
   );
   const animalId = await pool.query(
-    "SELECT id FROM animals WHERE animals.name=$1",
-    [animal]
+    `SELECT id FROM animals WHERE animals.name='${animal}'`
   );
   const animalTypeId = await pool.query(
-    "SELECT id FROM animal_types WHERE animal_types.type=$1",
-    [type]
+    `SELECT id FROM animal_types WHERE animal_types.type='${type}'`
   );
 
-  const countryAnimalRowExists = await pool.query(
-    `SELECT * FROM country_animal WHERE country_id=${countryId} AND animal_id=${animalId}`
+  const countryAnimalRow = await pool.query(
+    `SELECT * FROM country_animal 
+      WHERE country_id=${countryId.rows[0].id} AND animal_id=${animalId.rows[0].id}`
   );
-  const animalAnimalTypeRowExists = await pool.query(
-    `SELECT * FROM country_animal WHERE animal_id=${animalId} AND animal_type_id=${animalTypeId}`
+  const animalAnimalTypeRow = await pool.query(
+    `SELECT * FROM animal_animal_type
+      WHERE animal_id=${animalId.rows[0].id} AND animal_type_id=${animalTypeId.rows[0].id}`
   );
 
-  if (countryAnimalRowExists) {
+  if (countryAnimalRow.rowCount) {
     console.log(countryExists);
     console.log(animalExists);
   }
 
-  if (!countryAnimalRowExists) {
+  if (!countryAnimalRow.rowCount) {
     await pool.query(
-      `INSERT INTO country_animal (country_id, animal_id) VALUES (${countryId}, ${animalId})`
+      `INSERT INTO country_animal (country_id, animal_id) 
+        VALUES (${countryId.rows[0].id}, ${animalId.rows[0].id})`
     );
   }
 
-  if (!animalAnimalTypeRowExists) {
+  if (!animalAnimalTypeRow.rowCount) {
     await pool.query(
-      `INSERT INTO animal_animal_type (animal_id, animal_type_id) VALUES (${animalId}, ${animalTypeId})`
+      `INSERT INTO animal_animal_type (animal_id, animal_type_id) 
+        VALUES (${animalId.rows[0].id}, ${animalTypeId.rows[0].id})`
     );
   }
 }

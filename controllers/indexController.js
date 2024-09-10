@@ -10,8 +10,8 @@ async function getAnimalForm(req, res) {
 }
 
 async function createAnimal(req, res) {
-  const { name, country, type } = req.body;
-  await db.insertAnimal(name, country, type);
+  const { country, animal, type } = req.body;
+  await db.insertAnimal(country, animal, type);
   res.redirect("/");
 }
 

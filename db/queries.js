@@ -88,11 +88,13 @@ async function insertAnimal(country, animal, type) {
       WHERE animal_id=${animalId.rows[0].id} AND animal_type_id=${animalTypeId.rows[0].id}`
   );
 
+  // If rowCount is truthy (> 0), it means the countryAnimalRow exists, so run:
   if (countryAnimalRow.rowCount) {
     console.log(countryExists);
     console.log(animalExists);
   }
 
+  // If rowCount is falsy (0), it means the countryAnimalRow does not exist, so run:
   if (!countryAnimalRow.rowCount) {
     await pool.query(
       `INSERT INTO country_animal (country_id, animal_id) 
@@ -100,6 +102,7 @@ async function insertAnimal(country, animal, type) {
     );
   }
 
+  // If rowCount is falsy (0), it means the animalAnimalTypeRow does not exist, so run:
   if (!animalAnimalTypeRow.rowCount) {
     await pool.query(
       `INSERT INTO animal_animal_type (animal_id, animal_type_id) 

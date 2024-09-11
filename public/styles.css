@@ -1,0 +1,44 @@
+header {
+  text-align: center;
+}
+
+.cards-container {
+  margin-top: 20px;
+  padding-inline: 200px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0 1rem;
+}
+
+.card {
+  position: relative;
+  border: 1px solid gray;
+  border-radius: 5px;
+}
+
+.card__btns {
+  padding: 5px 10px;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.card__country {
+  border-bottom: 1px solid gray;
+  padding: 20px;
+}
+
+.card__animal {
+  position: relative;
+  padding: 20px;
+}
+
+.card__animal-type {
+  padding: 5px 10px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-bottom: 1px solid gray;
+  border-left: 1px solid gray;
+  border-bottom-left-radius: 5px;
+}

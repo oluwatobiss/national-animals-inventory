@@ -3,18 +3,29 @@
 
 <head>
   <title><%= title %></title>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 
 <body>
-  <h1><%= title %></h1>
-  <ul>
+  <header>
+    <h1><%= title %></h1>
+    <a href="/new-animal">Add your national animal</a>
+  </header>
+  <div class="cards-container">
     <% countries.forEach(function (row) { %>
-    <li><%= row.country %></li>
-    <li><%= row.national_animal %></li>
-    <li><%= row.type %></li>
+    <article class="card">
+      <span class="card__btns">
+        <a href="#">Delete</a>
+        <a href="#">Edit</a>
+      </span>
+      <div class="card__country"><%= row.country %></div>
+      <div class="card__animal">
+        <span><%= row.national_animal %></span>
+        <span class="card__animal-type"><%= row.type %></span>
+      </div>
+    </article>
     <% }) %>
-  </ul>
-  <a href="/new-animal">Add your national animal</a>
+  </div>
 </body>
 
 </html>

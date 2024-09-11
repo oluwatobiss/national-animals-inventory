@@ -27,16 +27,33 @@ CREATE TABLE IF NOT EXISTS animal_types (
 `;
 
 const selectAnimalsData = `
-SELECT countries.name as country, animals.name as national_animal, animal_types.type FROM countries 
+SELECT countries.id AS country_id, countries.name AS country, 
+animals.id AS animals_id, animals.name AS national_animal, 
+animal_types.id AS animal_types_id, animal_types.type 
+FROM countries 
 JOIN country_animal ON countries.id=country_animal.country_id
 JOIN animals ON animals.id=country_animal.animal_id
 JOIN animal_animal_type ON animals.id=animal_animal_type.animal_id
 JOIN animal_types ON animal_animal_type.animal_type_id=animal_types.id
 `;
 
+function selectAnimalData(id) {
+  return `
+  ${selectAnimalsData}
+  WHERE countries.id=${id}
+  `;
+}
+
 async function getAnimalsData() {
   await pool.query(createTables);
   const { rows } = await pool.query(selectAnimalsData);
+  // console.log(rows);
+  return rows;
+}
+
+async function getAnimalData(id) {
+  const { rows } = await pool.query(selectAnimalData(id));
+  console.log(rows);
   return rows;
 }
 
@@ -111,7 +128,27 @@ async function insertAnimal(country, animal, type) {
   }
 }
 
+async function updateAnimalData(id, country, animal, type) {
+  await pool.query(`
+    WITH temp_table AS (${selectAnimalData(id)})
+    UPDATE countries SET name='${country}'
+      WHERE id=(SELECT temp_table.country_id FROM temp_table)
+  `);
+  await pool.query(`
+    WITH temp_table AS (${selectAnimalData(id)})
+    UPDATE animals SET name='${animal}'
+      WHERE id=(SELECT temp_table.animals_id FROM temp_table)
+  `);
+  await pool.query(`
+    WITH temp_table AS (${selectAnimalData(id)})
+    UPDATE animal_types SET type='${type}'
+      WHERE id=(SELECT temp_table.animal_types_id FROM temp_table)
+  `);
+}
+
 module.exports = {
   getAnimalsData,
+  getAnimalData,
   insertAnimal,
+  updateAnimalData,
 };

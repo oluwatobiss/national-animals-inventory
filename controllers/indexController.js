@@ -19,7 +19,7 @@ async function getUpdateForm(req, res) {
 
 async function createAnimal(req, res) {
   const { country, animal, type } = req.body;
-  await db.insertAnimal(country, animal, type);
+  await db.insertAnimalData(country, animal, type);
   res.redirect("/");
 }
 

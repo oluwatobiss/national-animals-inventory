@@ -37,6 +37,10 @@ JOIN animal_animal_type ON animals.id=animal_animal_type.animal_id
 JOIN animal_types ON animal_animal_type.animal_type_id=animal_types.id
 `;
 
+let countryExists = false;
+let animalExists = false;
+let typeExists = false;
+
 function selectAnimalData(id) {
   return `
   ${selectAnimalsData}
@@ -44,28 +48,41 @@ function selectAnimalData(id) {
   `;
 }
 
+function showError(err) {
+  console.log("===Error inserting data===");
+  console.error(err.detail);
+}
+
+function getId(value) {
+  const idQueries = {
+    countryId: pool.query(`SELECT id FROM countries WHERE name='${value}'`),
+    animalId: pool.query(`SELECT id FROM animals WHERE name='${value}'`),
+    animalTypeId: pool.query(
+      `SELECT id FROM animal_types WHERE type='${value}'`
+    ),
+  };
+  return idQueries;
+}
+
+function getAnimalAnimalTypeRow(animalId, animalTypeId) {
+  return pool.query(
+    `SELECT * FROM animal_animal_type
+      WHERE animal_id=${animalId} AND animal_type_id=${animalTypeId}`
+  );
+}
+
 async function getAnimalsData() {
   await pool.query(createTables);
   const { rows } = await pool.query(selectAnimalsData);
-  // console.log(rows);
   return rows;
 }
 
 async function getAnimalData(id) {
   const { rows } = await pool.query(selectAnimalData(id));
-  console.log(rows);
   return rows;
 }
 
-async function insertAnimal(country, animal, type) {
-  let countryExists = false;
-  let animalExists = false;
-  let typeExists = false;
-  // Prevent duplicate data entry
-  function showError(err) {
-    console.log("===Error inserting data===");
-    console.error(err.detail);
-  }
+async function addCountryNAnimalIfNotInDB(country, animal) {
   try {
     await pool.query("INSERT INTO countries (name) VALUES ($1)", [country]);
   } catch (err) {
@@ -78,40 +95,39 @@ async function insertAnimal(country, animal, type) {
     showError(err);
     animalExists = err.detail.includes("already exists");
   }
+}
+
+async function addAnimalTypeIfNotInDB(type) {
   try {
     await pool.query("INSERT INTO animal_types (type) VALUES ($1)", [type]);
   } catch (err) {
     showError(err);
     typeExists = err.detail.includes("already exists");
   }
+}
 
-  // Prevent duplicate data relationship entry
-  const countryId = await pool.query(
-    `SELECT id FROM countries WHERE countries.name='${country}'`
-  );
-  const animalId = await pool.query(
-    `SELECT id FROM animals WHERE animals.name='${animal}'`
-  );
-  const animalTypeId = await pool.query(
-    `SELECT id FROM animal_types WHERE animal_types.type='${type}'`
-  );
+async function addRelationshipIfNotInDB(country, animal, type) {
+  const countryId = await getId(country).countryId;
+  const animalId = await getId(animal).animalId;
+  const animalTypeId = await getId(type).animalTypeId;
 
+  // Check if relationship exist in the db
   const countryAnimalRow = await pool.query(
     `SELECT * FROM country_animal 
       WHERE country_id=${countryId.rows[0].id} AND animal_id=${animalId.rows[0].id}`
   );
-  const animalAnimalTypeRow = await pool.query(
-    `SELECT * FROM animal_animal_type
-      WHERE animal_id=${animalId.rows[0].id} AND animal_type_id=${animalTypeId.rows[0].id}`
+  const animalAnimalTypeRow = await getAnimalAnimalTypeRow(
+    animalId.rows[0].id,
+    animalTypeId.rows[0].id
   );
 
-  // If rowCount is truthy (> 0), it means the countryAnimalRow exists, so run:
+  // If rowCount is truthy (> 0), it means the country_animal relationship exists in the db, so run:
   if (countryAnimalRow.rowCount) {
     console.log(countryExists);
     console.log(animalExists);
   }
 
-  // If rowCount is falsy (0), it means the countryAnimalRow does not exist, so run:
+  // If rowCount is falsy (0), it means the country_animal relationship does not exist in the db, so add it:
   if (!countryAnimalRow.rowCount) {
     await pool.query(
       `INSERT INTO country_animal (country_id, animal_id) 
@@ -119,7 +135,13 @@ async function insertAnimal(country, animal, type) {
     );
   }
 
-  // If rowCount is falsy (0), it means the animalAnimalTypeRow does not exist, so run:
+  // If rowCount is truthy (> 0), it means the animal_animal_type relationship exists in the db, so run:
+  if (animalAnimalTypeRow.rowCount) {
+    console.log(animalExists);
+    console.log(typeExists);
+  }
+
+  // If rowCount is falsy (0), it means the animal_animal_type relationship does not exist in the db, so add it:
   if (!animalAnimalTypeRow.rowCount) {
     await pool.query(
       `INSERT INTO animal_animal_type (animal_id, animal_type_id) 
@@ -128,27 +150,49 @@ async function insertAnimal(country, animal, type) {
   }
 }
 
-async function updateAnimalData(id, country, animal, type) {
+async function insertAnimalData(country, animal, type) {
+  addCountryNAnimalIfNotInDB(country, animal);
+  addAnimalTypeIfNotInDB(type);
+  addRelationshipIfNotInDB(country, animal, type);
+}
+
+async function updateAnimalData(country_id, country, animal, type) {
+  addAnimalTypeIfNotInDB(type);
   await pool.query(`
-    WITH temp_table AS (${selectAnimalData(id)})
-    UPDATE countries SET name='${country}'
-      WHERE id=(SELECT temp_table.country_id FROM temp_table)
+    UPDATE countries SET name='${country}' WHERE id=${country_id}
   `);
   await pool.query(`
-    WITH temp_table AS (${selectAnimalData(id)})
+    WITH temp_table AS (${selectAnimalData(country_id)})
     UPDATE animals SET name='${animal}'
       WHERE id=(SELECT temp_table.animals_id FROM temp_table)
   `);
-  await pool.query(`
-    WITH temp_table AS (${selectAnimalData(id)})
-    UPDATE animal_types SET type='${type}'
-      WHERE id=(SELECT temp_table.animal_types_id FROM temp_table)
-  `);
+
+  // Check if relationship exist in the db
+  const animalId = await getId(animal).animalId;
+  const animalTypeId = await getId(type).animalTypeId;
+  const animalAnimalTypeRow = await getAnimalAnimalTypeRow(
+    animalId.rows[0].id,
+    animalTypeId.rows[0].id
+  );
+
+  // If rowCount is truthy (> 0), it means the animal_animal_type relationship exists in the db, so run:
+  if (animalAnimalTypeRow.rowCount) {
+    console.log("Animal Exists!");
+    console.log(typeExists);
+  }
+
+  // If rowCount is falsy (0), it means the animal_animal_type relationship does not exist in the db, so update it:
+  if (!animalAnimalTypeRow.rowCount) {
+    await pool.query(`
+      UPDATE animal_animal_type SET animal_type_id=${animalTypeId.rows[0].id}
+        WHERE animal_id=${animalId.rows[0].id}
+    `);
+  }
 }
 
 module.exports = {
   getAnimalsData,
   getAnimalData,
-  insertAnimal,
+  insertAnimalData,
   updateAnimalData,
 };

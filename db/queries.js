@@ -48,6 +48,13 @@ function selectAnimalData(id) {
   `;
 }
 
+function selectAnimalsOfData(animalType) {
+  return `
+  ${selectAnimalsData}
+  WHERE animal_types.type='${animalType}'
+  `;
+}
+
 function showError(err) {
   console.log("===Error inserting data===");
   console.error(err.detail);
@@ -60,10 +67,13 @@ function getAnimalAnimalTypeRow(animalId, animalTypeId) {
   );
 }
 
-async function getAnimalsData() {
+async function getAnimalsData(animalType) {
+  let animalData = null;
   await pool.query(createTables);
-  const { rows } = await pool.query(selectAnimalsData);
-  return rows;
+  animalType
+    ? (animalData = await pool.query(selectAnimalsOfData(animalType)))
+    : (animalData = await pool.query(selectAnimalsData));
+  return animalData.rows;
 }
 
 async function getAnimalData(ids) {
@@ -111,6 +121,7 @@ async function addRelationshipIfNotInDB(country, animal, type) {
   );
 
   console.log("=== addRelationshipIfNotInDB ===");
+  console.log({ country, animal, type });
   console.log(countryId.rows);
   console.log(animalId.rows);
 

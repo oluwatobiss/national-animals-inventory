@@ -10,8 +10,21 @@
   <header>
     <h1><%= title %></h1>
     <a href="/new-animal">Add your national animal</a>
+    <div>
+      <span>Select animal type</span>
+      <span>
+        <a href="/">All</a>
+        <a href="/?animal_type=Amphibian">Amphibian</a>
+        <a href="/?animal_type=Bird">Bird</a>
+        <a href="/?animal_type=Fish">Fish</a>
+        <a href="/?animal_type=Invertebrate">Invertebrate</a>
+        <a href="/?animal_type=Mammal">Mammal</a>
+        <a href="/?animal_type=Reptile">Reptile</a>
+      </span>
+    </div>
   </header>
   <div class="cards-container">
+    <%- countries.length ? "" : `<strong>No ${type.toLowerCase()} animal type found</strong>` %>
     <% countries.forEach(function (row) { %>
     <article class="card">
       <span class="card__btns">

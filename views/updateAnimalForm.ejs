@@ -7,7 +7,7 @@
 
 <body>
   <h1><%= title %></h1>
-  <form action="/update/<%= row[0].country_id %>" method="POST">
+  <form action="/update/<%= row[0].country_id %>-<%= row[0].animal_id %>-<%= row[0].animal_type_id %>" method="POST">
     <label for="country">Country: </label>
     <input type="text" name="country" id="country" value="<%= row[0].country %>" required>
     <label for="animal">National animal: </label>

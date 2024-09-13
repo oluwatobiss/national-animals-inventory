@@ -5,8 +5,17 @@ const router = Router();
 router.get("/", controller.getAnimals);
 router.get("/new-animal", controller.getAnimalForm);
 router.post("/new-animal", controller.createAnimal);
-router.get("/update/:country_id-:animal_id-:type_id", controller.getUpdateForm);
-router.post("/update/:country_id-:animal_id-:type_id", controller.updateAnimal);
-router.get("/delete/:country_id-:animal_id-:type_id", controller.deleteAnimal);
+router.get(
+  "/update/:country_id-:animal_id-:animal_type_id",
+  controller.getUpdateForm
+);
+router.post(
+  "/update/:country_id-:animal_id-:animal_type_id",
+  controller.updateAnimal
+);
+router.get(
+  "/delete/:country_id-:animal_id-:animal_type_id",
+  controller.deleteAnimal
+);
 
 module.exports = router;

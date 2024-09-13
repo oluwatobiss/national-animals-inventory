@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS animal_types (
 const selectAnimalsData = `
 SELECT countries.id AS country_id, countries.name AS country, 
 animals.id AS animal_id, animals.name AS national_animal, 
-animal_types.id AS animal_types_id, animal_types.type 
+animal_types.id AS animal_type_id, animal_types.type 
 FROM countries 
 JOIN country_animal ON countries.id=country_animal.country_id
 JOIN animals ON animals.id=country_animal.animal_id
@@ -173,6 +173,9 @@ async function insertAnimalData(country, animal, type) {
 
 async function updateAnimalData(ids, country, animal, type) {
   addAnimalTypeIfNotInDB(type);
+  const newAnimalTypeId = await pool.query(
+    `SELECT id FROM animal_types WHERE type='${type}'`
+  );
   await pool.query(
     `UPDATE countries SET name='${country}' WHERE id=${ids.country_id}`
   );
@@ -182,7 +185,7 @@ async function updateAnimalData(ids, country, animal, type) {
   // Check if relationship exist in the db
   const animalAnimalTypeRow = await getAnimalAnimalTypeRow(
     ids.animal_id,
-    ids.type_id
+    newAnimalTypeId.rows[0].id
   );
   // If rowCount is truthy (> 0), it means the animal_animal_type relationship exists in the db, so run:
   if (animalAnimalTypeRow.rowCount) {
@@ -192,7 +195,7 @@ async function updateAnimalData(ids, country, animal, type) {
   // If rowCount is falsy (0), it means the animal_animal_type relationship does not exist in the db, so update it:
   if (!animalAnimalTypeRow.rowCount) {
     await pool.query(`
-      UPDATE animal_animal_type SET animal_type_id=${ids.type_id}
+      UPDATE animal_animal_type SET animal_type_id=${newAnimalTypeId.rows[0].id}
         WHERE animal_id=${ids.animal_id}
     `);
   }
@@ -204,7 +207,7 @@ async function deleteAnimalData(ids) {
   //   SELECT country, national_animal, type FROM temp_table
   //   WHERE country_id=${ids.country_id}
   //   AND animal_id=${ids.animal_id}
-  //   AND animal_types_id=${ids.type_id}
+  //   AND animal_type_id=${ids.animal_type_id}
   // `);
   const totalCountryCards = await pool.query(`
     WITH temp_table AS (${selectAnimalsData})
@@ -224,7 +227,7 @@ async function deleteAnimalData(ids) {
   if (totalAnimalCards.rows[0].count === "1") {
     await pool.query(`
       DELETE FROM animal_animal_type
-        WHERE animal_id=${ids.animal_id} AND animal_type_id=${ids.type_id}
+        WHERE animal_id=${ids.animal_id} AND animal_type_id=${ids.animal_type_id}
     `);
     await pool.query(`DELETE FROM animals WHERE id=${ids.animal_id}`);
   }

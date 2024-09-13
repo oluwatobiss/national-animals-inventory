@@ -15,8 +15,10 @@
     <% countries.forEach(function (row) { %>
     <article class="card">
       <span class="card__btns">
-        <a href="#">Delete</a>
-        <a href="/update/<%= row.country_id %>">Edit</a>
+        <a href="/delete/<%= row.country_id %>-<%= row.animal_id %>-<%= row.animal_types_id %>" onclick="return confirm('Are you sure you want to delete this <%= row.country %> card?');">
+          Delete
+        </a>
+        <a href="/update/<%= row.country_id %>-<%= row.animal_id %>-<%= row.animal_types_id %>">Edit</a>
       </span>
       <div class="card__country"><%= row.country %></div>
       <div class="card__animal">

@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS animal_types (
 
 const selectAnimalsData = `
 SELECT countries.id AS country_id, countries.name AS country, 
-animals.id AS animals_id, animals.name AS national_animal, 
+animals.id AS animal_id, animals.name AS national_animal, 
 animal_types.id AS animal_types_id, animal_types.type 
 FROM countries 
 JOIN country_animal ON countries.id=country_animal.country_id
@@ -53,17 +53,6 @@ function showError(err) {
   console.error(err.detail);
 }
 
-function getId(value) {
-  const idQueries = {
-    countryId: pool.query(`SELECT id FROM countries WHERE name='${value}'`),
-    animalId: pool.query(`SELECT id FROM animals WHERE name='${value}'`),
-    animalTypeId: pool.query(
-      `SELECT id FROM animal_types WHERE type='${value}'`
-    ),
-  };
-  return idQueries;
-}
-
 function getAnimalAnimalTypeRow(animalId, animalTypeId) {
   return pool.query(
     `SELECT * FROM animal_animal_type
@@ -77,18 +66,22 @@ async function getAnimalsData() {
   return rows;
 }
 
-async function getAnimalData(id) {
-  const { rows } = await pool.query(selectAnimalData(id));
+async function getAnimalData(ids) {
+  const { rows } = await pool.query(selectAnimalData(ids.country_id));
   return rows;
 }
 
-async function addCountryNAnimalIfNotInDB(country, animal) {
+async function addCountryIfNotInDB(country) {
   try {
     await pool.query("INSERT INTO countries (name) VALUES ($1)", [country]);
   } catch (err) {
     showError(err);
     countryExists = err.detail.includes("already exists");
   }
+}
+async function addAnimalIfNotInDB(animal) {
+  console.log("=== addAnimalIfNotInDB ===");
+  console.log(animal);
   try {
     await pool.query("INSERT INTO animals (name) VALUES ($1)", [animal]);
   } catch (err) {
@@ -107,9 +100,19 @@ async function addAnimalTypeIfNotInDB(type) {
 }
 
 async function addRelationshipIfNotInDB(country, animal, type) {
-  const countryId = await getId(country).countryId;
-  const animalId = await getId(animal).animalId;
-  const animalTypeId = await getId(type).animalTypeId;
+  const countryId = await pool.query(
+    `SELECT id FROM countries WHERE name='${country}'`
+  );
+  const animalId = await pool.query(
+    `SELECT id FROM animals WHERE name='${animal}'`
+  );
+  const animalTypeId = await pool.query(
+    `SELECT id FROM animal_types WHERE type='${type}'`
+  );
+
+  console.log("=== addRelationshipIfNotInDB ===");
+  console.log(countryId.rows);
+  console.log(animalId.rows);
 
   // Check if relationship exist in the db
   const countryAnimalRow = await pool.query(
@@ -151,42 +154,72 @@ async function addRelationshipIfNotInDB(country, animal, type) {
 }
 
 async function insertAnimalData(country, animal, type) {
-  addCountryNAnimalIfNotInDB(country, animal);
+  addCountryIfNotInDB(country);
+  addAnimalIfNotInDB(animal);
   addAnimalTypeIfNotInDB(type);
   addRelationshipIfNotInDB(country, animal, type);
 }
 
-async function updateAnimalData(country_id, country, animal, type) {
+async function updateAnimalData(ids, country, animal, type) {
   addAnimalTypeIfNotInDB(type);
-  await pool.query(`
-    UPDATE countries SET name='${country}' WHERE id=${country_id}
-  `);
-  await pool.query(`
-    WITH temp_table AS (${selectAnimalData(country_id)})
-    UPDATE animals SET name='${animal}'
-      WHERE id=(SELECT temp_table.animals_id FROM temp_table)
-  `);
-
-  // Check if relationship exist in the db
-  const animalId = await getId(animal).animalId;
-  const animalTypeId = await getId(type).animalTypeId;
-  const animalAnimalTypeRow = await getAnimalAnimalTypeRow(
-    animalId.rows[0].id,
-    animalTypeId.rows[0].id
+  await pool.query(
+    `UPDATE countries SET name='${country}' WHERE id=${ids.country_id}`
   );
-
+  await pool.query(
+    `UPDATE animals SET name='${animal}'WHERE id=${ids.animal_id}`
+  );
+  // Check if relationship exist in the db
+  const animalAnimalTypeRow = await getAnimalAnimalTypeRow(
+    ids.animal_id,
+    ids.type_id
+  );
   // If rowCount is truthy (> 0), it means the animal_animal_type relationship exists in the db, so run:
   if (animalAnimalTypeRow.rowCount) {
     console.log("Animal Exists!");
     console.log(typeExists);
   }
-
   // If rowCount is falsy (0), it means the animal_animal_type relationship does not exist in the db, so update it:
   if (!animalAnimalTypeRow.rowCount) {
     await pool.query(`
-      UPDATE animal_animal_type SET animal_type_id=${animalTypeId.rows[0].id}
-        WHERE animal_id=${animalId.rows[0].id}
+      UPDATE animal_animal_type SET animal_type_id=${ids.type_id}
+        WHERE animal_id=${ids.animal_id}
     `);
+  }
+}
+
+async function deleteAnimalData(ids) {
+  // const clickedCardInfo = await pool.query(`
+  //   WITH temp_table AS (${selectAnimalData(ids.country_id)})
+  //   SELECT country, national_animal, type FROM temp_table
+  //   WHERE country_id=${ids.country_id}
+  //   AND animal_id=${ids.animal_id}
+  //   AND animal_types_id=${ids.type_id}
+  // `);
+  const totalCountryCards = await pool.query(`
+    WITH temp_table AS (${selectAnimalsData})
+    SELECT COUNT(country) FROM temp_table
+    WHERE country_id=${ids.country_id}
+  `);
+  const totalAnimalCards = await pool.query(`
+    WITH temp_table AS (${selectAnimalsData})
+    SELECT COUNT(national_animal) FROM temp_table
+    WHERE animal_id=${ids.animal_id}
+  `);
+  await pool.query(`
+    DELETE FROM country_animal
+      WHERE country_id=${ids.country_id} AND animal_id=${ids.animal_id}
+  `);
+  // Delete the animal and its type relationship from db if the clicked card is the only one using it
+  if (totalAnimalCards.rows[0].count === "1") {
+    await pool.query(`
+      DELETE FROM animal_animal_type
+        WHERE animal_id=${ids.animal_id} AND animal_type_id=${ids.type_id}
+    `);
+    await pool.query(`DELETE FROM animals WHERE id=${ids.animal_id}`);
+  }
+  // Delete the country from db if the clicked card is the only one using it
+  if (totalCountryCards.rows[0].count === "1") {
+    await pool.query(`DELETE FROM countries WHERE id=${ids.country_id}`);
   }
 }
 
@@ -195,4 +228,5 @@ module.exports = {
   getAnimalData,
   insertAnimalData,
   updateAnimalData,
+  deleteAnimalData,
 };

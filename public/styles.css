@@ -7,7 +7,7 @@ header {
   padding-inline: 200px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 0 1rem;
+  gap: 1rem;
 }
 
 .card {

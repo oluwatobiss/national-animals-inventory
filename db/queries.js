@@ -41,13 +41,6 @@ let countryExists = false;
 let animalExists = false;
 let typeExists = false;
 
-function selectAnimalData(id) {
-  return `
-  ${selectAnimalsData}
-  WHERE countries.id=${id}
-  `;
-}
-
 function selectAnimalsOfData(animalType) {
   return `
   ${selectAnimalsData}
@@ -77,7 +70,10 @@ async function getAnimalsData(animalType) {
 }
 
 async function getAnimalData(ids) {
-  const { rows } = await pool.query(selectAnimalData(ids.country_id));
+  const { rows } = await pool.query(`
+    ${selectAnimalsData}
+    WHERE countries.id=${ids.country_id} AND animals.id=${ids.animal_id}
+  `);
   return rows;
 }
 
@@ -203,7 +199,7 @@ async function updateAnimalData(ids, country, animal, type) {
 
 async function deleteAnimalData(ids) {
   // const clickedCardInfo = await pool.query(`
-  //   WITH temp_table AS (${selectAnimalData(ids.country_id)})
+  //   WITH temp_table AS (`${selectAnimalsData} WHERE countries.id=${ids.country_id}`)
   //   SELECT country, national_animal, type FROM temp_table
   //   WHERE country_id=${ids.country_id}
   //   AND animal_id=${ids.animal_id}

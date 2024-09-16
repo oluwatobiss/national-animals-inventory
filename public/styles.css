@@ -1,5 +1,62 @@
+html {
+  font-family: "helvetica neue", helvetica, arial, sans-serif;
+}
+
+body {
+  background-color: #17181c;
+  color: cornsilk;
+}
+
 header {
   text-align: center;
+}
+
+h1 {
+  text-align: center;
+}
+
+nav {
+  display: flex;
+  justify-content: space-around;
+}
+
+nav a {
+  text-decoration: none;
+  font-size: 0.97rem;
+  font-weight: bold;
+  color: #333;
+  background-color: #eee;
+  margin-bottom: 10px;
+  padding: 6px 24px;
+  border-radius: 8px;
+  border-block: 1px solid #ccc;
+  border-inline: 1px solid #333;
+}
+
+nav a:hover {
+  background-color: #d8d8d8;
+}
+
+.animal-type-btn {
+  margin-left: 5px;
+}
+
+.animal-type-btn.active {
+  background-color: greenyellow;
+}
+
+.animal-type-btn.active:hover {
+  background-color: greenyellow;
+}
+
+.add-new-btn {
+  border-block: 1px solid indigo;
+  background-color: indigo;
+  color: cornsilk;
+}
+
+.add-new-btn:hover {
+  background-color: rgb(92, 2, 156);
 }
 
 .cards-container {

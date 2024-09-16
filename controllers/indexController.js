@@ -7,6 +7,7 @@ async function getAnimals(req, res) {
     title: "National Animals",
     countries: animalsData,
     type: animalType,
+    clickedTypeBtn: animalType,
   });
 }
 

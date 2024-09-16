@@ -9,19 +9,32 @@
 <body>
   <header>
     <h1><%= title %></h1>
-    <a href="/new-animal">Add your national animal</a>
-    <div>
-      <span>Select animal type</span>
-      <span>
-        <a href="/">All</a>
-        <a href="/?animal_type=Amphibian">Amphibian</a>
-        <a href="/?animal_type=Bird">Bird</a>
-        <a href="/?animal_type=Fish">Fish</a>
-        <a href="/?animal_type=Invertebrate">Invertebrate</a>
-        <a href="/?animal_type=Mammal">Mammal</a>
-        <a href="/?animal_type=Reptile">Reptile</a>
+    <nav>
+      <span class="type-list-btns-container">
+        <a href="/" class="<%= clickedTypeBtn === undefined ? 'active' : '' %> animal-type-btn">
+          All
+        </a>
+        <a href="/?animal_type=Amphibian" class="<%= clickedTypeBtn === 'Amphibian' ? 'active' : '' %> animal-type-btn">
+          Amphibian
+        </a>
+        <a href="/?animal_type=Bird" class="<%= clickedTypeBtn === 'Bird' ? 'active' : '' %> animal-type-btn">
+          Bird
+        </a>
+        <a href="/?animal_type=Fish" class="<%= clickedTypeBtn === 'Fish' ? 'active' : '' %> animal-type-btn">
+          Fish
+        </a>
+        <a href="/?animal_type=Invertebrate" class="<%= clickedTypeBtn === 'Invertebrate' ? 'active' : '' %> animal-type-btn">
+          Invertebrate
+        </a>
+        <a href="/?animal_type=Mammal" class="<%= clickedTypeBtn === 'Mammal' ? 'active' : '' %> animal-type-btn">
+          Mammal
+        </a>
+        <a href="/?animal_type=Reptile" class="<%= clickedTypeBtn === 'Reptile' ? 'active' : '' %> animal-type-btn">
+          Reptile
+        </a>
       </span>
-    </div>
+      <span class="add-btn-container"><a href="/new-animal" class="add-new-btn">Add new</a></span>
+    </nav>
   </header>
   <div class="cards-container">
     <%- countries.length ? "" : `<strong>No ${type?.toLowerCase() || "" } animal type found</strong>` %>

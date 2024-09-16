@@ -8,6 +8,7 @@ async function getAnimals(req, res) {
     countries: animalsData,
     type: animalType,
     clickedTypeBtn: animalType,
+    randomColor: `hsl(${Math.floor(Math.random() * 361)},100%,10%)`,
   });
 }
 

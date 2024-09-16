@@ -13,7 +13,7 @@ async function getAnimals(req, res) {
 }
 
 async function getAnimalForm(req, res) {
-  res.render("newAnimalForm", { title: "Add Your National Animal" });
+  res.render("newAnimalForm", { title: "Add a National Animal" });
 }
 
 async function getUpdateForm(req, res) {

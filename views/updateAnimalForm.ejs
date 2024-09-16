@@ -3,28 +3,32 @@
 
 <head>
   <title><%= title %></title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/form.css">
 </head>
 
 <body>
-  <h1><%= title %></h1>
-  <form action="/update/<%= row[0].country_id %>-<%= row[0].animal_id %>-<%= row[0].animal_type_id %>" method="POST">
-    <label for="country">Country: </label>
-    <input type="text" name="country" id="country" value="<%= row[0].country %>" required>
-    <label for="animal">National animal: </label>
-    <input type="text" name="animal" id="animal" value="<%= row[0].national_animal %>" required>
-    <label for="type">Type: </label>
-    <select name="type" id="type" required>
-      <option value="">--Select the animal's type--</option>
-      <option value="Amphibian" <%= row[0].type === "Amphibian" ? "selected" : "" %>>Amphibian</option>
-      <option value="Bird" <%= row[0].type === "Bird" ? "selected" : "" %>>Bird</option>
-      <option value="Fish" <%= row[0].type === "Fish" ? "selected" : "" %>>Fish</option>
-      <option value="Invertebrate" <%= row[0].type === "Invertebrate" ? "selected" : "" %>>Invertebrate</option>
-      <option value="Mammal" <%= row[0].type === "Mammal" ? "selected" : "" %>>Mammal</option>
-      <option value="Reptile" <%= row[0].type === "Reptile" ? "selected" : "" %>>Reptile</option>
-    </select>
-    <button type="submit">Update</button>
-  </form>
-  <a href="/">Back to home</a>
+  <main>
+    <h1><%= title %></h1>
+    <form action="/update/<%= row[0].country_id %>-<%= row[0].animal_id %>-<%= row[0].animal_type_id %>" method="POST">
+      <label for="country">Country</label>
+      <input type="text" name="country" id="country" value="<%= row[0].country %>" required>
+      <label for="animal">National animal</label>
+      <input type="text" name="animal" id="animal" value="<%= row[0].national_animal %>" required>
+      <label for="type">Type</label>
+      <select name="type" id="type" required>
+        <option value="">--Select the animal's type--</option>
+        <option value="Amphibian" <%= row[0].type === "Amphibian" ? "selected" : "" %>>Amphibian</option>
+        <option value="Bird" <%= row[0].type === "Bird" ? "selected" : "" %>>Bird</option>
+        <option value="Fish" <%= row[0].type === "Fish" ? "selected" : "" %>>Fish</option>
+        <option value="Invertebrate" <%= row[0].type === "Invertebrate" ? "selected" : "" %>>Invertebrate</option>
+        <option value="Mammal" <%= row[0].type === "Mammal" ? "selected" : "" %>>Mammal</option>
+        <option value="Reptile" <%= row[0].type === "Reptile" ? "selected" : "" %>>Reptile</option>
+      </select>
+      <button type="submit">Update</button>
+      <a href="/" class="return-home-btn">Back to home</a>
+    </form>
+  </main>
 </body>
 
 </html>

@@ -3,28 +3,32 @@
 
 <head>
   <title><%= title %></title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/form.css">
 </head>
 
 <body>
-  <h1><%= title %></h1>
-  <form action="/new-animal" method="POST">
-    <label for="country">Country: </label>
-    <input type="text" name="country" id="country" required>
-    <label for="animal">National animal: </label>
-    <input type="text" name="animal" id="animal" required>
-    <label for="type">Type: </label>
-    <select name="type" id="type" required>
-      <option value="">--Select the animal's type--</option>
-      <option value="Amphibian">Amphibian</option>
-      <option value="Bird">Bird</option>
-      <option value="Fish">Fish</option>
-      <option value="Invertebrate">Invertebrate</option>
-      <option value="Mammal">Mammal</option>
-      <option value="Reptile">Reptile</option>
-    </select>
-    <button type="submit">Submit</button>
-  </form>
-  <a href="/">Back to home</a>
+  <main>
+    <h1><%= title %></h1>
+    <form action="/new-animal" method="POST">
+      <label for="country">Country</label>
+      <input type="text" name="country" id="country" required>
+      <label for="animal">National animal</label>
+      <input type="text" name="animal" id="animal" required>
+      <label for="type">Type</label>
+      <select name="type" id="type" required>
+        <option value="">--Select the animal's type--</option>
+        <option value="Amphibian">Amphibian</option>
+        <option value="Bird">Bird</option>
+        <option value="Fish">Fish</option>
+        <option value="Invertebrate">Invertebrate</option>
+        <option value="Mammal">Mammal</option>
+        <option value="Reptile">Reptile</option>
+      </select>
+      <button type="submit">Submit</button>
+      <a href="/" class="return-home-btn">Back to home</a>
+    </form>
+  </main>
 </body>
 
 </html>

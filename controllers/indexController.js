@@ -31,20 +31,32 @@ async function getAnimals(req, res) {
 }
 
 async function getAnimalForm(req, res) {
-  res.render("newAnimalForm", { title: "Add a National Animal" });
+  res.render("newAnimalForm", {
+    title: "Add a National Animal",
+    errInputs: {
+      country: "",
+      animal: "",
+      type: "",
+    },
+  });
 }
 
 const createAnimal = [
   formValidator,
   async (req, res) => {
+    const { country, animal, type } = req.body;
     const result = validationResult(req);
     if (!result.isEmpty()) {
       return res.status(400).render("newAnimalForm", {
         title: "Add a National Animal",
         errors: result.array(),
+        errInputs: {
+          country,
+          animal,
+          type,
+        },
       });
     }
-    const { country, animal, type } = req.body;
     await db.insertAnimalData(country, animal, type);
     res.redirect("/");
   },

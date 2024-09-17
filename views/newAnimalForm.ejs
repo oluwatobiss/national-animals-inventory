@@ -11,26 +11,26 @@
   <main>
     <h1><%= title %></h1>
     <% if (locals.errors) {%>
-      <ul>
-        <% errors.forEach(function(error) { %>
-        <li><%= error.msg %></li>
-        <% }) %>
-      </ul>
+    <ul>
+      <% errors.forEach(function(error) { %>
+      <li><%= error.msg %></li>
+      <% }) %>
+    </ul>
     <% } %>
     <form action="/new-animal" method="POST">
       <label for="country">Country</label>
-      <input type="text" name="country" id="country" required>
+      <input type="text" name="country" id="country" value="<%= errInputs.country %>" required>
       <label for="animal">National animal</label>
-      <input type="text" name="animal" id="animal" required>
+      <input type="text" name="animal" id="animal" value="<%= errInputs.animal %>" required>
       <label for="type">Type</label>
       <select name="type" id="type" required>
         <option value="">--Select the animal's type--</option>
-        <option value="Amphibian">Amphibian</option>
-        <option value="Bird">Bird</option>
-        <option value="Fish">Fish</option>
-        <option value="Invertebrate">Invertebrate</option>
-        <option value="Mammal">Mammal</option>
-        <option value="Reptile">Reptile</option>
+        <option value="Amphibian" <%= errInputs.type === "Amphibian" ? "selected" : "" %>>Amphibian</option>
+        <option value="Bird" <%= errInputs.type === "Bird" ? "selected" : "" %>>Bird</option>
+        <option value="Fish" <%= errInputs.type === "Fish" ? "selected" : "" %>>Fish</option>
+        <option value="Invertebrate" <%= errInputs.type === "Invertebrate" ? "selected" : "" %>>Invertebrate</option>
+        <option value="Mammal" <%= errInputs.type === "Mammal" ? "selected" : "" %>>Mammal</option>
+        <option value="Reptile" <%= errInputs.type === "Reptile" ? "selected" : "" %>>Reptile</option>
       </select>
       <button type="submit">Submit</button>
       <a href="/" class="return-home-btn">Back to home</a>

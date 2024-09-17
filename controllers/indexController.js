@@ -27,20 +27,11 @@ async function getAnimals(req, res) {
     countries: animalsData,
     type: animalType,
     clickedTypeBtn: animalType,
-    randomColor: `hsl(${Math.floor(Math.random() * 361)},100%,10%)`,
   });
 }
 
 async function getAnimalForm(req, res) {
   res.render("newAnimalForm", { title: "Add a National Animal" });
-}
-
-async function getUpdateForm(req, res) {
-  const row = await db.getAnimalData(req.params);
-  res.render("updateAnimalForm", {
-    title: "Update National Animal",
-    row,
-  });
 }
 
 const createAnimal = [
@@ -58,6 +49,14 @@ const createAnimal = [
     res.redirect("/");
   },
 ];
+
+async function getUpdateForm(req, res) {
+  const row = await db.getAnimalData(req.params);
+  res.render("updateAnimalForm", {
+    title: "Update National Animal",
+    row,
+  });
+}
 
 const updateAnimal = [
   formValidator,

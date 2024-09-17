@@ -10,13 +10,13 @@ main {
 
 input,
 select {
+  box-sizing: border-box;
   display: inline-block;
-  width: 100%;
-  padding: 12px 20px;
-  margin-block: 8px;
   border: 1px solid cornsilk;
   border-radius: 4px;
-  box-sizing: border-box;
+  margin-block: 8px;
+  padding: 12px 20px;
+  width: 100%;
   font-size: 1.1rem;
 }
 

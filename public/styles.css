@@ -7,10 +7,6 @@ body {
   color: cornsilk;
 }
 
-header {
-  text-align: center;
-}
-
 h1 {
   text-align: center;
 }
@@ -33,19 +29,15 @@ nav a {
   border-inline: 1px solid #333;
 }
 
-nav a:hover {
-  background-color: #d8d8d8;
-}
-
 .animal-type-btn {
   margin-left: 5px;
 }
 
-.animal-type-btn.active {
-  border-block: 1px solid #fdb03a;
-  background-color: #fdb03a;
+.animal-type-btn:hover {
+  background-color: #d8d8d8;
 }
 
+.animal-type-btn.active,
 .animal-type-btn.active:hover {
   border-block: 1px solid #fdb03a;
   background-color: #fdb03a;
@@ -78,12 +70,12 @@ nav a:hover {
 
 .card {
   position: relative;
+  background-color: cornsilk;
+  box-shadow: rgba(253, 250, 218, 0.24) 0px 3px 8px;
   border: 1px solid cornsilk;
   border-radius: 10px;
   max-width: 295px;
   max-height: 170px;
-  box-shadow: rgba(253, 250, 218, 0.24) 0px 3px 8px;
-  background-color: cornsilk;
 }
 
 .card__btns {
@@ -113,14 +105,14 @@ nav a:hover {
 .card__country {
   overflow: hidden;
   box-sizing: border-box;
-  font-family: "Rock Salt", cursive;
-  font-size: 2.9rem;
-  font-weight: 600;
-  color: #fff;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
   padding: 20px;
   height: 57%;
+  font-family: "Rock Salt", cursive;
+  font-size: 2.9rem;
+  font-weight: 600;
+  color: #fff;
 }
 
 .card__animal {
@@ -136,10 +128,10 @@ nav a:hover {
 }
 
 .card__animal-type {
+  border-bottom-left-radius: 5px;
   padding: 5px 10px;
   position: absolute;
   top: 0;
   right: 0;
-  border-bottom-left-radius: 5px;
   color: #fff;
 }

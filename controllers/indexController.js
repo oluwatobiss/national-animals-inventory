@@ -9,7 +9,7 @@ const formValidator = [
     .trim()
     .isAlpha("en-US", { ignore: " " })
     .withMessage(`Country ${alphaErr}`)
-    .isLength({ min: 4, max: 30 })
+    .isLength({ min: 2, max: 30 })
     .withMessage(`Country ${lengthErr}`),
   body("animal")
     .trim()
